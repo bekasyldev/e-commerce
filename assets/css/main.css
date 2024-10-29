@@ -1,0 +1,20 @@
+:root {
+    --font-stack: 'Poppins', sans-serif;
+    --container-width: 1200px;
+    --main-padding: calc((100vw - var(--container-width)) / 2);
+    --header-height: 0;
+  
+    scroll-padding-top: var(--header-height);
+  }
+  
+  html {
+    height: 100%;
+    /* scroll-behavior: smooth; */
+  }
+  
+  body {
+    height: 100%;
+    font-family: var(--font-stack);
+    background-color: #FDFCF9;
+    color: #222227;
+}
