@@ -14,5 +14,6 @@
       :isLiked="true"
     />
   </div>
+  <Features />
   <Footer />
 </template>
