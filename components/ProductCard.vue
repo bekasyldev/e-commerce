@@ -1,93 +1,83 @@
 <script setup lang="ts">
-import RatingStar from "~/components/ui/RatingStar";
+import CardLikeBtn from "~/components/CardLikeBtn.vue";
+import RatingStar from "~/components/ui/RatingStar.vue";
+import { useUserStore } from "~/store/user";
+
 interface ProductCard {
+  id: string;
   name: string;
   imgSrc: string;
   imgAlt?: string;
   inCart: boolean;
   isLiked?: boolean;
-  star?: number;
+  star: number;
   orderCount?: number;
   tags?: "discount" | "new";
   price: number;
-  colors?: string[];
+  originalPrice?: number;
+  discount?: number;
 }
 
 const props = defineProps<ProductCard>();
-const emit = defineEmits(["toggleCart", "toggleLike"]);
+const userStore = useUserStore();
 
-const handleCart = () => {
-  emit("toggleCart");
-};
-
-const handleLike = () => {
-  emit("toggleLike");
+const handleAddToCart = () => {
+  userStore.toggleCartItem(props.id);
 };
 </script>
 
 <template>
-  <div class="w-[270px] h-[350px]">
-    <div class="relative group]">
-      <!-- Image Container -->
+  <div class="relative w-[270px] h-[350px] group">
+    <!-- Image Container -->
+    <div class="relative w-full h-[250px] bg-gray-100 overflow-hidden">
+      <NuxtImg
+        :src="imgSrc"
+        :alt="imgAlt"
+        width="180"
+        height="133"
+        class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+
+      <!-- Discount Tag -->
       <div
-        class="relative flex items-center justify-center bg-gray-100 w-full h-[250px]"
+        v-if="discount"
+        class="absolute top-2 left-2 bg-[#DB4444] text-white text-sm px-3 py-1 rounded"
       >
-        <NuxtImg
-          class="object-cover"
-          width="180"
-          height="133"
-          :src="imgSrc"
-          :alt="imgAlt"
+        -{{ discount }}%
+      </div>
+
+      <!-- Like Button - Now static -->
+      <div class="absolute top-2 right-2">
+        <CardLikeBtn
+          :id="id"
+          :initial="isLiked || false"
+          class="w-8 h-8 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
         />
-        <!-- Tags -->
-        <div class="absolute top-2 left-2 bg-[#DB4444] text-white text-sm px-1">
-          -40%
-        </div>
-        <!-- Action Buttons -->
-        <div class="absolute top-2 right-2 flex flex-col gap-2">
-          <button
-            @click="handleLike"
-            class="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-100 transition-colors"
-          >
-            <NuxtImg src="/svg/heart.svg" height="24" width="24" />
-          </button>
-          <button
-            @click="handleCart"
-            class="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-gray-100 transition-colors"
-          >
-            <NuxtImg src="/svg/cart.svg" height="24" width="24" />
-          </button>
-        </div>
-        <!-- Add to Cart Button (shows on hover) -->
-        <div
-          class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20"
+      </div>
+
+      <!-- Add to Cart Button Overlay - Modified height -->
+      <div
+        class="absolute bottom-0 left-0 right-0 h-16 flex items-center justify-center bg-black/20 opacity-0 transform transition-all duration-300 group-hover:opacity-100"
+      >
+        <button
+          @click="handleAddToCart"
+          class="w-full h-full bg-white text-black font-medium hover:bg-gray-100 transition-colors flex items-center justify-center"
         >
-          <BtnBase class="z-10">Add to Cart</BtnBase>
-        </div>
+          Add to Cart
+        </button>
       </div>
     </div>
+
     <!-- Product Info -->
-    <div class="mt-2">
-      <p class="uppercase font-medium">{{ name }}</p>
-      <div class="space-x-4">
-        <span class="text-[#DB4444]">$ {{ price }}</span>
-        <span class="text-gray-400">$160</span>
+    <div class="mt-4 space-y-2">
+      <h3 class="font-medium uppercase truncate">{{ name }}</h3>
+      <div class="flex items-center space-x-3">
+        <span class="text-[#DB4444] font-semibold">$ {{ price }}</span>
+        <span v-if="originalPrice" class="text-gray-400 line-through">
+          ${{ originalPrice }}
+        </span>
       </div>
-      <RatingStar :star="'4'" :orderCount="'120'" />
-      <!-- <div class="flex gap-2 mt-2">
-        <span
-          class="rounded-full border-black border w-5 h-5"
-          :style="{ backgroundColor: color }"
-          v-for="color in colors"
-          :key="color"
-        ></span>
-      </div> -->
+      <RatingStar :star="star" :orderCount="90" class="mt-1" />
     </div>
   </div>
 </template>
-
-<style scoped>
-.group:hover .group-hover\:opacity-100 {
-  opacity: 1;
-}
-</style>
